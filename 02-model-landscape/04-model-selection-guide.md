@@ -27,8 +27,8 @@ Start Here
     │   └── No ──┐                                       │
     │            │                                       ▼
     │            │                              ┌─────────────────┐
-    │            │                              │ GPT-5.5 / Claude│
-    │            │                              │ 4.5 Opus / o3   │
+    │            │                              │ Claude Opus 4.8 │
+    │            │                              │ GPT-5.5 reason. │
     │            │                              └─────────────────┘
     │            │
     ├── Need best software engineering / coding?
@@ -36,8 +36,9 @@ Start Here
     │   └── No ──┐                                       │
     │            │                                       ▼
     │            │                              ┌─────────────────┐
-    │            │                              │ Claude Opus 4.7 │
-    │            │                              │ Claude Sonnet 4.6│
+    │            │                              │ GPT-5.5 88.7% / │
+    │            │                              │ Opus 4.8 88.6%  │
+    │            │                              │ Sonnet 4.6 cheap│
     │            │                              └─────────────────┘
     │            │
     ├── Need to process massive context (>1M)?
@@ -80,15 +81,16 @@ Start Here
 
 ## Capability Comparison
 
-### Frontier Model Comparison (December 2025)
+### Frontier Model Comparison (May 2026)
 
 | Model | Strengths | Cons | Context | Best For |
 |-------|-----------|------|---------|----------|
-| **GPT-5.5** | Agentic planning, native omni | High cost | 512K | Multi-agent systems |
-| **Claude Opus 4.7** | SoTA Software Engineering | Expensive | 400K | Complex codebases |
-| **Claude Sonnet 4.6** | Hybrid Reasoning depth | High peak latency | 200K | General production |
-| **Gemini 3.0 Pro** | 2.5M context, multimodal | Latency spikes | 2.5M | Large data ingestion |
-| **o3** | Extreme logic/reasoning | High cost/latency | 128K | Math, complex debug |
+| **Claude Opus 4.8** | Long-running agentic coding (SWE-bench 88.6%), Dynamic Workflows with parallel subagents, $10/$50 fast mode | Same $5/$25 standard pricing as 4.7; GPT-5.5 narrowly leads single-shot SWE-bench | 1M | Codebase-scale migrations, autonomous coding loops |
+| **GPT-5.5** | SWE-bench Verified leader (88.7%), Terminal-Bench leader (78.2%), native omni multimodal | High cost ($5/$30) | 1M | Multi-agent systems, single-shot coding |
+| **Claude Opus 4.7** | Predecessor flagship (SWE-bench 87.6%, SWE-Bench Pro 64.3%) | Superseded by 4.8 at same price | 1M | Existing 4.7 deployments without migration pressure |
+| **Claude Sonnet 4.6** | Strong cost/quality balance, full 1M at standard price | No Sonnet 4.8 release yet | 1M | General production workhorse |
+| **Gemini 3.1 Pro** | GPQA Diamond leader (94.3%), 1M multimodal, Deep Think mode | Latency spikes on Deep Think | 1M | Scientific reasoning, multimodal |
+| **DeepSeek-R1** | Open-source reasoning, competitive math | Reasoning only; non-frontier general use | 128K | Math, complex debug, open-weight reasoning |
 
 ### Budget Model Comparison
 
@@ -110,40 +112,42 @@ Start Here
 
 ## Use Case Mapping
 
-### By Application Type (Dec 2025)
+### By Application Type (May 2026)
 
 | Use Case | Recommended Models | Rationale |
 |----------|-------------------|-----------|
-| **Autonomous Dev** | Claude Opus 4.7, Claude Sonnet 4.6 | "Claude Code" agentic mastery & verified coding |
-| **Enterprise RAG** | Gemini 3.0 Pro, Gemini 3 Flash | 2.5M context removes retrieval complexity |
-| **customer Support** | Gemini 3 Flash, GPT-5.5-mini | Near-zero latency with strong reasoning |
-| **Reasoning / Debug** | o3, DeepSeek-R1 | Best at "Thinking" mode for code/logic |
-| **Video/Multimodal** | Gemini 3.0 Pro, GPT-5.5 | Native interleaved multimodal processing |
-| **Private Agent** | Llama 4 70B, Nemotron 3 | Strongest open-weight agentic planning |
+| **Autonomous Dev** | Claude Opus 4.8 with Dynamic Workflows, Claude Sonnet 4.6 | Parallel-subagent runs in Claude Code; top SWE-Bench Pro at 69.2% |
+| **Enterprise RAG** | Gemini 3.1 Pro, Gemini 3.1 Flash, DeepSeek V4 Flash | 1M context and aggressive cache discounts remove retrieval complexity |
+| **Customer Support** | Gemini 3.1 Flash, GPT-5.5-mini, Claude Haiku 4.5 | Near-zero latency with strong reasoning |
+| **Reasoning / Debug** | GPT-5.5 reasoning, Claude Opus 4.8 (thinking), DeepSeek-R1 | Best at hidden-CoT for code and logic |
+| **Video / Multimodal** | Gemini 3.1 Pro, GPT-5.5, Claude Opus 4.8 | Native interleaved multimodal processing |
+| **Private Agent** | Llama 4 Maverick, DeepSeek V4 Pro (open weights) | Strongest open-weight agentic planning |
 
 ### By Constraint
 
 | Constraint | Approach |
 |------------|----------|
-| **Max latency < 100ms** | Gemini 3 Flash, o4-mini, or self-hosted Nano models |
-| **Context > 1M tokens** | Gemini 3.0 Pro (native 2.5M) |
-| **Zero-data Leakage** | Llama 4 70B on internal VPC |
-| **Complex Tool Use** | Claude Opus 4.7 or GPT-5.5 (best planning accuracy) |
+| **Max latency < 100ms** | Gemini 3.1 Flash, GPT-5.5-mini, Claude Haiku 4.5, or self-hosted Nano models |
+| **Context > 1M tokens** | Claude Opus 4.8 / Opus 4.7 / Sonnet 4.6, Gemini 3.1 Pro, GPT-5.5, Llama 4 Scout (10M) |
+| **Zero-data Leakage** | Llama 4 70B, DeepSeek V4 Pro on internal VPC |
+| **Complex Tool Use** | Claude Opus 4.8 or GPT-5.5 (best planning accuracy) |
 
 ---
 
 ## Cost Analysis
 
-### Cost Modeling (Dec 2025)
+### Cost Modeling (May 2026)
 
 | Model | Input / 1M | Output / 1M | Notes |
 |-------|------------|-------------|-------|
-| **GPT-5.5** | $5.00 | $20.00 | Agentic premium |
-| **Claude Opus 4.7** | $15.00 | $75.00 | Specialized engineering |
-| **Claude Sonnet 4.6** | $3.00 | $15.00 | Balanced choice |
-| **Gemini 3.0 Pro** | $1.25 | $5.00 | Best value frontier |
-| **Gemini 3 Flash** | $0.05 | $0.20 | RAG-at-scale winner |
-| **o4-mini** | $0.10 | $0.40 | Logic-on-a-budget |
+| **Claude Opus 4.8** | $5.00 | $25.00 | Frontier coding and agentic; optional fast mode $10 / $50 |
+| **Claude Opus 4.7** | $5.00 | $25.00 | Same standard price; fast mode is the more expensive $30 / $150 |
+| **GPT-5.5** | $5.00 | $30.00 | Single-shot SWE-bench leader |
+| **Claude Sonnet 4.6** | $3.00 | $15.00 | Balanced choice; no Sonnet 4.8 release yet |
+| **Gemini 3.1 Pro** | $2.00 | $12.00 | Best value frontier; multimodal |
+| **DeepSeek V4 Pro** | $0.435 | $0.87 | 75% discount made permanent May 22 |
+| **Gemini 3.1 Flash** | $0.10 | $3.00 | RAG-at-scale; cache discount |
+| **DeepSeek V4 Flash** | $0.14 | $0.28 | Cheapest frontier-class 1M context |
 
 ### Cost Comparison Example
 
@@ -154,7 +158,7 @@ Assume 1M queries/month, 1K input tokens + 500 output tokens per query:
 | 10K queries/mo | $150 | $105 | $37.50 | $1.50 |
 | 1M queries/mo | $15,000 | $10,500 | $3,750 | $150 |
 
-*2025 Insight: Gemini 3 Flash has effectively commoditized RAG, making long-context processing cheaper than traditional vector search infra at scale.*
+*Insight: DeepSeek V4 Flash ($0.14 / $0.28) and Gemini 3.1 Flash ($0.10 / $3.00) have effectively commoditized RAG, making long-context processing cheaper than traditional vector search infra at scale.*
 
 ---
 
