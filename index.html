@@ -210,6 +210,13 @@
   .btn-mark:hover { border-color: var(--accent-2); }
   .btn-mark.done { background: var(--accent-2); color: #fff; border-color: var(--accent-2); }
 
+  /* Language toggle */
+  .lang-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg-elev); }
+  .lang-seg button { border: none; background: none; color: var(--text-soft); font-weight: 700; font-size: .82rem; padding: 7px 11px; cursor: pointer; transition: .15s; }
+  .lang-seg button:hover { color: var(--text); }
+  .lang-seg button.on { background: var(--accent); color: #fff; }
+  .reader-note { background: var(--accent-soft); border: 1px solid var(--border); border-radius: 9px; padding: 8px 13px; font-size: .85rem; color: var(--text-soft); margin-bottom: 14px; }
+
   .empty { text-align: center; color: var(--text-mute); padding: 50px 0; font-size: 1rem; }
 
   /* Resources */
@@ -289,9 +296,13 @@
     <nav class="nav-links">
       <a href="#paths">學習路徑</a>
       <a href="#curriculum">課程章節</a>
-      <a href="#cases">實戰案例</a>
+      <a href="#ch-16">實戰案例</a>
       <a href="#resources">延伸資源</a>
     </nav>
+    <div class="lang-seg" id="langSeg" role="group" aria-label="課程內文語言 Content language">
+      <button data-lang="zh" type="button" title="課程內文顯示中文（無中文版時顯示英文）">中文</button>
+      <button data-lang="en" type="button" title="Show lesson content in English">EN</button>
+    </div>
     <button class="icon-btn" id="themeToggle" title="切換深色 / 淺色" aria-label="切換主題">🌙</button>
   </div>
 </header>
@@ -584,6 +595,20 @@
     renderHomeDiagram();
   }
 
+  /* ---------- Content language ---------- */
+  var LANG = loadLang();
+  function loadLang() {
+    try { return localStorage.getItem("aisd-lang") || "zh"; } catch (e) { return "zh"; }
+  }
+  function setLang(l) {
+    LANG = l;
+    try { localStorage.setItem("aisd-lang", l); } catch (e) {}
+    document.querySelectorAll("#langSeg button").forEach(function (b) {
+      b.classList.toggle("on", b.getAttribute("data-lang") === l);
+    });
+    if (overlay && overlay.classList.contains("open") && currentReaderFile) loadReaderContent();
+  }
+
   /* ---------- Parse curriculum ---------- */
   function parseCurriculum(text) {
     var chapters = [];
@@ -783,41 +808,61 @@
 
   function basePath(file) { return file.replace(/[^/]+$/, ""); }
 
-  async function openReader(file, title) {
+  function openReader(file, title) {
     overlay.classList.add("open");
     document.body.style.overflow = "hidden";
     titleEl.textContent = title || file;
-    srcEl.href = file;
     currentReaderFile = file;
     updateReaderDoneBtn();
-    body.innerHTML = '<div class="loading">載入中…</div>';
     overlay.scrollTop = 0;
+    loadReaderContent();
+  }
+
+  // Loads the current lesson in the selected language: tries <name>.zh.md when
+  // LANG is "zh", falls back to the English <name>.md with a note if missing.
+  async function loadReaderContent() {
+    var file = currentReaderFile;
+    if (!file) return;
+    body.innerHTML = '<div class="loading">載入中…</div>';
+    var note = "";
+    var fetchFile = file;
+    if (LANG === "zh" && /\.md$/i.test(file)) {
+      var zh = file.replace(/\.md$/i, ".zh.md");
+      try {
+        var rz = await fetch(zh, { cache: "no-store" });
+        if (rz.ok) { srcEl.href = zh; renderMd(await rz.text(), file, ""); return; }
+      } catch (e) {}
+      note = "中文版翻譯中，先顯示英文原文 · Chinese translation in progress — showing the English original.";
+    }
+    srcEl.href = fetchFile;
     try {
-      var res = await fetch(file, { cache: "no-store" });
+      var res = await fetch(fetchFile, { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
-      var md = await res.text();
-      if (window.marked) {
-        // fix relative links so they keep working within the repo
-        var html = marked.parse(md);
-        body.innerHTML = html;
-        rewriteLinks(file);
-        renderMermaid();
-      } else {
-        var pre = document.createElement("pre");
-        pre.textContent = md;
-        body.innerHTML = "";
-        body.appendChild(pre);
-      }
+      renderMd(await res.text(), file, note);
     } catch (e) {
       body.innerHTML =
         '<div class="fallback">' +
         "<strong>無法在頁面內載入這份文件。</strong><br><br>" +
         "若你是用 <code>file://</code> 直接開啟這個 HTML，瀏覽器會基於安全限制封鎖讀取本機檔案。" +
-        "請改用本機伺服器開啟，例如在專案根目錄執行：<br><br>" +
+        "請改用本機伺服器開啟（或 <code>make study</code>），例如在專案根目錄執行：<br><br>" +
         "<code>python3 -m http.server</code><br><br>" +
         "然後瀏覽 <code>http://localhost:8000/index.html</code>。<br><br>" +
         "或直接<a href='" + file + "' target='_blank' rel='noopener'>開啟原始 Markdown 檔 ↗</a>。" +
         "</div>";
+    }
+  }
+
+  function renderMd(md, baseFile, note) {
+    var noteHtml = note ? '<div class="reader-note">🌐 ' + note + "</div>" : "";
+    if (window.marked) {
+      body.innerHTML = noteHtml + marked.parse(md);
+      rewriteLinks(baseFile);
+      renderMermaid();
+    } else {
+      body.innerHTML = noteHtml;
+      var pre = document.createElement("pre");
+      pre.textContent = md;
+      body.appendChild(pre);
     }
   }
 
@@ -926,6 +971,12 @@
     markedReady: function () { if (window.marked) { try { marked.setOptions({ gfm: true, breaks: false }); } catch (e) {} } },
     mermaidReady: function () { initMermaidTheme(); renderHomeDiagram(); }
   };
+
+  /* ---------- Language toggle wiring ---------- */
+  document.querySelectorAll("#langSeg button").forEach(function (b) {
+    b.addEventListener("click", function () { setLang(b.getAttribute("data-lang")); });
+  });
+  setLang(LANG);
 
   runSearch();
   updateProgressUI();
