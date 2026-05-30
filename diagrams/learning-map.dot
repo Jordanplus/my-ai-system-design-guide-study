@@ -1,0 +1,22 @@
+digraph learnmap {
+  rankdir=TB;
+  bgcolor="transparent";
+  splines=true;
+  nodesep=0.35; ranksep=0.55;
+  node [shape=box style="rounded,filled" fontname="PingFang TC" fontsize=12 color="#d3d7e6" penwidth=1.2 margin="0.20,0.11"];
+  edge [color="#9aa0b4" fontname="PingFang TC" fontsize=10 penwidth=1.1 arrowsize=0.75];
+
+  start [label="新訪客  New visitor" shape=oval fillcolor="#5b5bd6" fontcolor="white" color="#5b5bd6"];
+  goal  [label="你的目標？" shape=diamond fillcolor="#ecedfb" fontcolor="#16181d" color="#b9bcf0"];
+
+  ip1 [label="題庫 110+" fillcolor="#eef4fb"]; ip2 [label="答題框架" fillcolor="#eef4fb"];
+  rag1 [label="RAG 基礎" fillcolor="#e7f5ec"]; rag2 [label="切塊 + 向量庫" fillcolor="#e7f5ec"];
+  ag1 [label="代理基礎" fillcolor="#fdede8"]; ag2 [label="MCP 與工具使用" fillcolor="#fdede8"];
+  md1 [label="模型分類" fillcolor="#fef6e0"]; md2 [label="定價與選型 2026" fillcolor="#fef6e0"];
+  ev1 [label="AI Evals 指南" fillcolor="#eafaf8"]; ev2 [label="Phoenix / LangWatch" fillcolor="#eafaf8"];
+
+  start -> goal;
+  goal -> ip1 [label="面試準備"]; goal -> rag1 [label="打造 RAG"]; goal -> ag1 [label="建構代理"];
+  goal -> md1 [label="選擇模型"]; goal -> ev1 [label="評估 AI"];
+  ip1 -> ip2; rag1 -> rag2; ag1 -> ag2; md1 -> md2; ev1 -> ev2;
+}

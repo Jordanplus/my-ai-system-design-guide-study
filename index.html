@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 系統設計教學指南 · AI System Design Guide</title>
+<meta name="description" content="AI 系統設計、RAG、LLM 工程、代理系統、MCP/A2A 與面試準備的完整教學入口。18 章、110+ 課、20 個實戰案例。" />
+<style>
+  :root {
+    --bg: #f7f8fb;
+    --bg-soft: #ffffff;
+    --bg-elev: #ffffff;
+    --text: #16181d;
+    --text-soft: #4a4f5c;
+    --text-mute: #767c8a;
+    --border: #e6e8ee;
+    --border-soft: #eef0f5;
+    --accent: #5b5bd6;
+    --accent-2: #00b4a6;
+    --accent-soft: #ecedfb;
+    --shadow: 0 1px 2px rgba(20,24,40,.04), 0 8px 24px rgba(20,24,40,.06);
+    --shadow-lg: 0 12px 40px rgba(20,24,40,.14);
+    --radius: 14px;
+    --maxw: 1180px;
+  }
+  html[data-theme="dark"] {
+    --bg: #0c0e14;
+    --bg-soft: #12151e;
+    --bg-elev: #161a25;
+    --text: #eef1f7;
+    --text-soft: #c2c8d6;
+    --text-mute: #8b93a7;
+    --border: #232938;
+    --border-soft: #1c2230;
+    --accent: #8b8bf0;
+    --accent-2: #2ad4c4;
+    --accent-soft: #1b1f37;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    --shadow-lg: 0 16px 48px rgba(0,0,0,.55);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC",
+      "Noto Sans TC", "Microsoft JhengHei", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 22px; }
+
+  /* Header */
+  header.site {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: saturate(160%) blur(12px);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav { display: flex; align-items: center; gap: 16px; height: 62px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; letter-spacing: -.01em; }
+  .brand .logo { font-size: 1.4rem; }
+  .brand small { font-weight: 600; color: var(--text-mute); font-size: .72rem; display: block; letter-spacing: .02em; }
+  .nav .spacer { flex: 1; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-links a {
+    color: var(--text-soft); font-weight: 600; font-size: .9rem;
+    padding: 7px 12px; border-radius: 9px;
+  }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--text); text-decoration: none; }
+  .icon-btn {
+    display: inline-grid; place-items: center; width: 38px; height: 38px;
+    border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elev);
+    cursor: pointer; color: var(--text); font-size: 1.05rem; transition: .15s;
+  }
+  .icon-btn:hover { border-color: var(--accent); }
+
+  /* Hero */
+  .hero { padding: 64px 0 30px; position: relative; overflow: hidden; }
+  .hero::before {
+    content: ""; position: absolute; inset: -30% -10% auto -10%; height: 480px; z-index: 0;
+    background: radial-gradient(60% 60% at 20% 10%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+                radial-gradient(50% 50% at 90% 0%, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent 70%);
+    pointer-events: none;
+  }
+  .hero .inner { position: relative; z-index: 1; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; font-size: .78rem; font-weight: 700;
+    color: var(--accent); background: var(--accent-soft); padding: 6px 13px; border-radius: 999px;
+    letter-spacing: .04em; text-transform: uppercase; margin-bottom: 18px;
+  }
+  .hero h1 { font-size: clamp(2.1rem, 5vw, 3.5rem); line-height: 1.08; margin: 0 0 16px; letter-spacing: -.025em; font-weight: 850; }
+  .hero h1 .grad {
+    background: linear-gradient(100deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p.lead { font-size: clamp(1.02rem, 2vw, 1.22rem); color: var(--text-soft); max-width: 720px; margin: 0 0 26px; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: .95rem;
+    padding: 12px 20px; border-radius: 11px; cursor: pointer; border: 1px solid transparent; transition: .15s;
+  }
+  .btn:hover { text-decoration: none; transform: translateY(-1px); }
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: var(--shadow); }
+  .btn-ghost { background: var(--bg-elev); color: var(--text); border-color: var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 34px; }
+  .stat {
+    background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; box-shadow: var(--shadow);
+  }
+  .stat .num { font-size: 2rem; font-weight: 850; letter-spacing: -.02em;
+    background: linear-gradient(100deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat .lbl { color: var(--text-mute); font-size: .85rem; font-weight: 600; }
+
+  /* Section */
+  section.block { padding: 46px 0 8px; }
+  .section-head { margin-bottom: 24px; }
+  .section-head h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 6px; letter-spacing: -.02em; font-weight: 800; }
+  .section-head p { color: var(--text-soft); margin: 0; max-width: 740px; }
+
+  /* Paths */
+  .paths { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .path {
+    display: block; background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px; box-shadow: var(--shadow); transition: .18s; position: relative; overflow: hidden;
+  }
+  .path:hover { transform: translateY(-3px); border-color: var(--accent); text-decoration: none; box-shadow: var(--shadow-lg); }
+  .path .pico { font-size: 1.8rem; }
+  .path h3 { margin: 12px 0 6px; font-size: 1.12rem; color: var(--text); letter-spacing: -.01em; }
+  .path .steps { color: var(--text-mute); font-size: .85rem; }
+  .path .go { margin-top: 14px; color: var(--accent); font-weight: 700; font-size: .88rem; }
+
+  /* Search */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 8px; }
+  .search-box { position: relative; flex: 1; min-width: 260px; }
+  .search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-mute); }
+  .search-box input {
+    width: 100%; padding: 13px 16px 13px 42px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--bg-elev); color: var(--text); font-size: .98rem; outline: none; transition: .15s;
+  }
+  .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+  .result-count { color: var(--text-mute); font-size: .85rem; font-weight: 600; }
+
+  /* Chapter chips (jump nav) */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 6px; }
+  .chip {
+    font-size: .8rem; font-weight: 700; padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--bg-elev); color: var(--text-soft); cursor: pointer; transition: .15s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--text); text-decoration: none; }
+
+  /* Curriculum */
+  .chapter { margin-top: 38px; scroll-margin-top: 80px; }
+  .ch-head { display: flex; align-items: baseline; gap: 12px; padding-bottom: 14px; border-bottom: 2px solid var(--border-soft); margin-bottom: 18px; flex-wrap: wrap; }
+  .ch-num {
+    font-variant-numeric: tabular-nums; font-weight: 850; font-size: 1.05rem; color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; flex: none;
+  }
+  .ch-titles h3 { margin: 0; font-size: 1.3rem; letter-spacing: -.01em; }
+  .ch-titles .zh { color: var(--text-mute); font-weight: 600; font-size: .92rem; }
+  .ch-count { margin-left: auto; color: var(--text-mute); font-size: .82rem; font-weight: 700; align-self: center; }
+
+  .lessons { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 13px; }
+  .lesson {
+    display: flex; flex-direction: column; gap: 6px; background: var(--bg-elev);
+    border: 1px solid var(--border); border-radius: 12px; padding: 15px 16px; cursor: pointer;
+    transition: .16s; text-align: left; color: inherit; position: relative;
+  }
+  .lesson:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; box-shadow: var(--shadow); }
+  .lesson .lt { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: .98rem; color: var(--text); letter-spacing: -.01em; }
+  .lesson .lt .n { color: var(--accent); font-variant-numeric: tabular-nums; font-size: .85rem; font-weight: 800; }
+  .lesson .ld { color: var(--text-soft); font-size: .855rem; line-height: 1.5; margin: 0; }
+  .lesson .lt { padding-right: 28px; }
+  .lesson .done-toggle {
+    position: absolute; top: 13px; right: 12px; width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid var(--border); background: var(--bg); color: #fff; font-size: .72rem; font-weight: 800;
+    display: grid; place-items: center; cursor: pointer; z-index: 2; transition: .15s; line-height: 1;
+  }
+  .lesson .done-toggle:hover { border-color: var(--accent-2); transform: scale(1.12); }
+  .lesson.done { border-color: color-mix(in srgb, var(--accent-2) 55%, var(--border)); background: color-mix(in srgb, var(--accent-2) 7%, var(--bg-elev)); }
+  .lesson.done .done-toggle { background: var(--accent-2); border-color: var(--accent-2); }
+  .lesson.done .lt span:last-child { color: var(--text-mute); }
+
+  /* Progress widget */
+  .progress-wrap { margin-top: 18px; max-width: 540px; }
+  .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 12px; }
+  .progress-text { font-weight: 700; font-size: .9rem; color: var(--text-soft); }
+  .reset-btn { font-size: .78rem; font-weight: 600; color: var(--text-mute); background: none; border: 1px solid var(--border); border-radius: 8px; padding: 4px 11px; cursor: pointer; transition: .15s; }
+  .reset-btn:hover { border-color: var(--accent); color: var(--text); }
+  .progress-bar { height: 10px; border-radius: 999px; background: var(--border-soft); overflow: hidden; }
+  .progress-fill { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .35s ease; }
+
+  /* Home diagram */
+  .diagram-card { margin-top: 18px; background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
+  .diagram-title { font-weight: 800; margin-bottom: 10px; color: var(--text); letter-spacing: -.01em; }
+  #homeDiagram { min-height: 60px; text-align: center; overflow-x: auto; }
+  #homeDiagram svg { max-width: 100%; height: auto; }
+  .diagram-note { color: var(--text-mute); font-size: .82rem; margin: 10px 0 0; }
+
+  /* Reader mark-as-read button */
+  .btn-mark { font-size: .8rem; font-weight: 700; padding: 7px 13px; border-radius: 9px; border: 1px solid var(--border); background: var(--bg-elev); color: var(--text); cursor: pointer; white-space: nowrap; transition: .15s; }
+  .btn-mark:hover { border-color: var(--accent-2); }
+  .btn-mark.done { background: var(--accent-2); color: #fff; border-color: var(--accent-2); }
+
+  .empty { text-align: center; color: var(--text-mute); padding: 50px 0; font-size: 1rem; }
+
+  /* Resources */
+  .resources { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .res {
+    display: flex; gap: 14px; align-items: flex-start; background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); transition: .16s; color: inherit;
+  }
+  .res:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; box-shadow: var(--shadow-lg); }
+  .res .ico { font-size: 1.6rem; line-height: 1; }
+  .res h4 { margin: 0 0 4px; font-size: 1.02rem; color: var(--text); }
+  .res p { margin: 0; color: var(--text-soft); font-size: .85rem; }
+
+  /* Footer */
+  footer.site { margin-top: 60px; border-top: 1px solid var(--border); padding: 34px 0 50px; color: var(--text-mute); font-size: .9rem; }
+  footer.site .frow { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+  footer.site a { font-weight: 600; }
+
+  /* Reader modal */
+  .reader-overlay {
+    position: fixed; inset: 0; z-index: 100; background: rgba(8,10,16,.55);
+    backdrop-filter: blur(4px); display: none; padding: 4vh 16px; overflow-y: auto;
+  }
+  .reader-overlay.open { display: block; }
+  .reader {
+    max-width: 860px; margin: 0 auto; background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: 16px; box-shadow: var(--shadow-lg); overflow: hidden; animation: pop .2s ease;
+  }
+  @keyframes pop { from { transform: translateY(14px) scale(.99); opacity: 0; } to { transform: none; opacity: 1; } }
+  .reader-head {
+    position: sticky; top: 0; display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+    background: color-mix(in srgb, var(--bg-soft) 90%, transparent); border-bottom: 1px solid var(--border); backdrop-filter: blur(8px);
+  }
+  .reader-head .rt { font-weight: 800; font-size: 1.02rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .reader-head .src { font-size: .82rem; font-weight: 700; }
+  .reader-body { padding: 8px 30px 40px; }
+  .reader-body .loading { padding: 40px 0; text-align: center; color: var(--text-mute); }
+  .reader-body .fallback { padding: 24px; background: var(--accent-soft); border-radius: 12px; color: var(--text-soft); font-size: .92rem; }
+  .reader-body .fallback code { background: var(--bg-elev); padding: 2px 7px; border-radius: 6px; font-size: .88em; }
+
+  /* Markdown styling */
+  .md h1, .md h2, .md h3, .md h4 { letter-spacing: -.01em; line-height: 1.3; margin: 1.5em 0 .6em; }
+  .md h1 { font-size: 1.7rem; border-bottom: 2px solid var(--border-soft); padding-bottom: .3em; }
+  .md h2 { font-size: 1.35rem; border-bottom: 1px solid var(--border-soft); padding-bottom: .25em; }
+  .md h3 { font-size: 1.12rem; }
+  .md p, .md li { color: var(--text-soft); }
+  .md a { font-weight: 600; }
+  .md code { background: var(--accent-soft); color: var(--text); padding: 2px 6px; border-radius: 6px; font-size: .86em;
+    font-family: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .md pre { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px; padding: 16px; overflow-x: auto; }
+  .md pre code { background: none; padding: 0; font-size: .85em; }
+  .md table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: .9rem; display: block; overflow-x: auto; }
+  .md th, .md td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+  .md th { background: var(--accent-soft); font-weight: 700; }
+  .md blockquote { border-left: 4px solid var(--accent); margin: 1em 0; padding: .2em 1em; color: var(--text-mute); background: var(--bg-elev); border-radius: 0 8px 8px 0; }
+  .md img { max-width: 100%; border-radius: 8px; }
+  .md hr { border: none; border-top: 1px solid var(--border); margin: 1.5em 0; }
+  .md .mermaid { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; overflow-x: auto; }
+
+  @media (max-width: 860px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .paths, .resources { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .reader-body { padding: 8px 18px 36px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <div class="brand">
+      <span class="logo">🧠</span>
+      <span>AI 系統設計教學指南<small>AI System Design Guide · 面試與生產實戰</small></span>
+    </div>
+    <div class="spacer"></div>
+    <nav class="nav-links">
+      <a href="#paths">學習路徑</a>
+      <a href="#curriculum">課程章節</a>
+      <a href="#cases">實戰案例</a>
+      <a href="#resources">延伸資源</a>
+    </nav>
+    <button class="icon-btn" id="themeToggle" title="切換深色 / 淺色" aria-label="切換主題">🌙</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap inner">
+    <span class="eyebrow">✨ 持續更新 · 涵蓋至 2026 年 5 月</span>
+    <h1>從零到生產的<br><span class="grad">AI 系統設計</span>完整教學</h1>
+    <p class="lead">
+      一份持續更新的 AI 系統設計實戰指南，涵蓋 LLM 原理、RAG 架構、代理系統、MCP / A2A 協定、
+      推論優化、評估與可觀測性，以及資深工程師面試準備。每一課都附帶生產級權衡取捨與真實失敗案例。
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#curriculum">📚 開始學習</a>
+      <a class="btn btn-ghost" href="00-interview-prep/01-question-bank.md" data-md>🎯 110+ 面試題庫</a>
+      <a class="btn btn-ghost" href="06-retrieval-systems/01-rag-fundamentals.md" data-md>🔍 RAG 基礎</a>
+    </div>
+    <div class="stats" id="stats">
+      <div class="stat"><div class="num" id="statCh">18</div><div class="lbl">教學章節</div></div>
+      <div class="stat"><div class="num" id="statLessons">110+</div><div class="lbl">課程單元</div></div>
+      <div class="stat"><div class="num" id="statCases">20</div><div class="lbl">實戰案例</div></div>
+      <div class="stat"><div class="num">2026</div><div class="lbl">最新模型版圖</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Learning Paths -->
+<section class="block" id="paths">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>🧭 學習路徑</h2>
+      <p>不知道從哪開始？選一條目標導向的路徑，依序學習最關鍵的章節。</p>
+    </div>
+    <div class="paths" id="pathGrid"></div>
+    <div class="diagram-card">
+      <div class="diagram-title">🗺️ 整體學習地圖</div>
+      <div class="mermaid" id="homeDiagram"></div>
+      <p class="diagram-note">提示：依你的目標從中間節點往外走兩步即可上手；圖中分支對應上方的學習路徑。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Curriculum -->
+<section class="block" id="curriculum">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>📚 課程章節</h2>
+      <p>18 個章節、110+ 課程單元，依 AI 系統生命週期組織。點擊任一課即可在頁面內直接閱讀；勾選右上角圓圈即可記錄學習進度。</p>
+      <div class="progress-wrap">
+        <div class="progress-row">
+          <span class="progress-text" id="progressText">已完成 0 / 0 課</span>
+          <button class="reset-btn" id="resetProgress">重設進度</button>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="search" id="search" placeholder="搜尋課程… 例如 RAG、MCP、quantization、fine-tuning、agent" autocomplete="off" />
+      </div>
+      <span class="result-count" id="resultCount"></span>
+    </div>
+    <div class="chips" id="chipNav"></div>
+    <div id="curriculumGrid"></div>
+    <div class="empty" id="emptyState" style="display:none">🔍 找不到符合的課程，換個關鍵字試試。</div>
+  </div>
+</section>
+
+<!-- Resources -->
+<section class="block" id="resources">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>📦 延伸資源</h2>
+      <p>速查表、深入指南與學習資源，輔助你的 AI 系統設計學習。</p>
+    </div>
+    <div class="resources" id="resourceGrid"></div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap frow">
+    <div>
+      <strong>🧠 AI 系統設計教學指南</strong><br>
+      內容由 <a href="https://github.com/ombharatiya" target="_blank" rel="noopener">Om Bharatiya</a> 維護 · MIT License ·
+      教學網頁由 Claude Code 產生
+    </div>
+    <div>
+      <a href="https://github.com/ombharatiya/ai-system-design-guide" target="_blank" rel="noopener">GitHub Repo ↗</a> ·
+      <a href="README.md" data-md>README</a> ·
+      <a href="GLOSSARY.md" data-md>名詞表</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Reader modal -->
+<div class="reader-overlay" id="readerOverlay">
+  <div class="reader" role="dialog" aria-modal="true">
+    <div class="reader-head">
+      <span class="rt" id="readerTitle">Loading…</span>
+      <button class="btn-mark" id="readerDone">標記已讀</button>
+      <a class="src" id="readerSrc" href="#" target="_blank" rel="noopener">原始檔 ↗</a>
+      <button class="icon-btn" id="readerClose" title="關閉 (Esc)" aria-label="關閉">✕</button>
+    </div>
+    <div class="reader-body md" id="readerBody"><div class="loading">載入中…</div></div>
+  </div>
+</div>
+
+<!-- Curriculum data (pipe-delimited; one chapter per "##" line, one lesson per line) -->
+<script type="text/plain" id="curriculumData">
+## 00|Interview Prep|面試準備|🎯
+00-interview-prep/README.md|Overview &amp; Roadmap|Interview prep for senior/staff AI roles: questions, frameworks, pitfalls, exercises, and 2026 trends.
+00-interview-prep/01-question-bank.md|Question Bank (110+)|Topic-organized bank of 110+ interview questions with model answers, follow-ups, and strong-candidate signals.
+00-interview-prep/02-answer-frameworks.md|Answer Frameworks|Five structured frameworks: SPIDER for design, ETA for concepts, tradeoff analysis, debugging, and STAR-L for behavioral.
+00-interview-prep/03-common-pitfalls.md|Common Pitfalls|Frequent mistakes candidates make, why they hurt your evaluation, and how to avoid them.
+00-interview-prep/04-whiteboard-exercises.md|Whiteboard Exercises|Detailed walkthroughs of common AI design exercises with structured solutions and discussion points.
+00-interview-prep/05-behavioral-for-ai-roles.md|Behavioral Questions|Handling ambiguity, cross-discipline collaboration, and AI-specific challenges with strong frameworks.
+00-interview-prep/06-job-market-trends-2026.md|Job Market Trends (May 2026)|Titles, screened skills, comp ranges, and interview formats from 100+ listings and recruiter signals.
+00-interview-prep/07-faq.md|FAQ|Short, direct answers to the most-asked questions, each pointing to the in-depth chapter.
+## 01|Foundations|基礎原理|🧱
+01-foundations/01-llm-internals.md|LLM Internals|Transformers, MoE, attention math, RoPE, GQA, KV cache, and the inference-optimal scaling shift.
+01-foundations/02-tokenization-deep-dive.md|Tokenization Deep Dive|How text becomes tokens, and the impact on capabilities, cost, and performance.
+01-foundations/03-attention-mechanisms.md|Attention Mechanisms|Mathematical foundations, variants, and optimizations of the core transformer innovation.
+01-foundations/04-transformer-architecture.md|Transformer Architecture|A unified view assembling all components into the complete transformer.
+01-foundations/05-embeddings-and-vector-spaces.md|Embeddings &amp; Vector Spaces|Dense vector representations that power RAG and semantic search.
+01-foundations/06-inference-pipeline.md|Inference Pipeline|How LLMs generate text at inference, the computational phases, and serving metrics.
+## 02|Model Landscape|模型版圖|🗺️
+02-model-landscape/01-model-taxonomy.md|Model Taxonomy|The May 2026 model landscape: families, capabilities, and selection criteria.
+02-model-landscape/02-capability-assessment.md|Capability Assessment|Evaluating and comparing models for your use case beyond generic benchmarks.
+02-model-landscape/03-pricing-and-costs.md|Pricing &amp; Costs|Pricing models, cost optimization, and total cost of ownership analysis.
+02-model-landscape/04-model-selection-guide.md|Model Selection Guide|A practical framework balancing capability, cost, latency, and operations.
+## 03|Training &amp; Adaptation|訓練與微調|🎓
+03-training-and-adaptation/01-pretraining-basics.md|Pretraining Basics|The most expensive phase: learning general knowledge from massive datasets.
+03-training-and-adaptation/02-fine-tuning-strategies.md|Fine-Tuning Strategies|Adapting models for task, domain, and style — teaching format and behavior.
+03-training-and-adaptation/03-lora-qlora-peft.md|LoRA, QLoRA &amp; PEFT|Parameter-efficient fine-tuning mechanics and advanced variants.
+03-training-and-adaptation/04-rlhf-and-dpo.md|RLHF &amp; DPO (Alignment)|From RLHF to efficient DPO and online RL for aligning model behavior.
+03-training-and-adaptation/05-knowledge-distillation.md|Knowledge Distillation|Transferring intelligence from a large teacher to a small, efficient student.
+03-training-and-adaptation/06-synthetic-data-generation.md|Synthetic Data Generation|The primary engine for model improvement past the data wall.
+03-training-and-adaptation/07-quantization-deep-dive.md|Quantization Deep Dive|Reducing weight precision to save memory and speed up inference.
+## 04|Inference Optimization|推論優化|⚡
+04-inference-optimization/01-inference-fundamentals.md|Inference Fundamentals|Architectural efficiency for reasoning-heavy workloads on H100/B200-class hardware.
+04-inference-optimization/02-kv-cache-and-context-caching.md|KV Cache &amp; Context Caching|Managing the biggest memory consumer in long-context systems.
+04-inference-optimization/03-speculative-decoding.md|Speculative Decoding|Generating multiple tokens per pass to beat the memory-bandwidth bottleneck.
+04-inference-optimization/04-batching-strategies.md|Batching Strategies|Iteration-level orchestration to maximize throughput and cut cost.
+04-inference-optimization/05-paged-attention.md|PagedAttention|The algorithm behind vLLM/SGLang that solves memory fragmentation.
+04-inference-optimization/06-serving-infrastructure.md|Serving Infrastructure|Load balancing, model parallelism, and orchestrating an inference fleet.
+04-inference-optimization/07-cost-optimization-playbook.md|Cost Optimization Playbook|Cut inference cost 10x via routing and caching without losing quality.
+## 05|Prompting &amp; Context|提示與情境工程|✍️
+05-prompting-and-context/01-prompt-engineering-fundamentals.md|Prompt Engineering Fundamentals|From trial-and-error to disciplined, architectural prompt design.
+05-prompting-and-context/02-few-shot-and-icl.md|Few-Shot &amp; In-Context Learning|Teaching tasks via examples in the prompt, with no weight updates.
+05-prompting-and-context/03-chain-of-thought.md|Chain-of-Thought (CoT)|Intermediate reasoning steps — now the core of reasoning models.
+05-prompting-and-context/04-tree-of-thought.md|Tree-of-Thought (ToT)|Exploring multiple reasoning paths with evaluation and backtracking.
+05-prompting-and-context/05-context-engineering.md|Context Engineering|Ranking relevance and managing compute budget in 1M+ token windows.
+05-prompting-and-context/06-structured-generation.md|Structured Generation|Forcing 100%-reliable JSON/YAML output with engine-level constraints.
+05-prompting-and-context/07-prompt-optimization-dspy.md|Prompt Optimization (DSPy)|Algorithmic prompt optimization for robust LLM pipelines.
+05-prompting-and-context/08-prompt-injection-defense.md|Prompt Injection &amp; Defense|The #1 OWASP LLM risk, treated as an architectural concern.
+## 06|Retrieval Systems (RAG)|檢索系統|🔍
+06-retrieval-systems/01-rag-fundamentals.md|RAG Fundamentals|From naive vector search to agentic &amp; graph retrieval; RAG vs long context.
+06-retrieval-systems/02-chunking-strategies.md|Chunking Strategies|Structure-aware and semantic segmentation, late chunking, contextual prepending.
+06-retrieval-systems/03-embedding-models.md|Embedding Models|Multi-resolution, late-interaction, and multimodal embeddings.
+06-retrieval-systems/04-vector-databases.md|Vector Databases|Storing and searching embeddings at 100M+ scale with sub-100ms P99.
+06-retrieval-systems/05-hybrid-search.md|Hybrid Search|Combining dense and sparse retrieval — the production baseline.
+06-retrieval-systems/06-reranking-strategies.md|Reranking Strategies|Second-stage high-precision re-scoring that bridges search and grounding.
+06-retrieval-systems/07-graph-rag.md|GraphRAG|Knowledge graphs + RAG for global reasoning across a whole dataset.
+06-retrieval-systems/08-agentic-rag.md|Agentic RAG|A reasoning loop deciding when/what to retrieve (Self-RAG, CRAG, Adaptive).
+06-retrieval-systems/09-advanced-retrieval-patterns.md|Advanced Retrieval Patterns|Specialized patterns for complex query-document gaps.
+06-retrieval-systems/10-contextual-retrieval.md|Contextual Retrieval|Ingestion-time context to fix chunks that lose meaning (Anthropic).
+06-retrieval-systems/11-late-interaction-colbert.md|Late Interaction &amp; ColBERT|Cross-encoder accuracy at bi-encoder speed, with multimodal extensions.
+06-retrieval-systems/12-multimodal-rag.md|Multi-Modal RAG|Retrieval over images, tables, charts, and mixed-layout documents.
+06-retrieval-systems/13-rag-evaluation-patterns.md|RAG Evaluation Patterns|The RAG Triad, component metrics, and automated regression testing.
+06-retrieval-systems/14-production-rag-at-scale.md|Production RAG at Scale|Distributed RAG with caching, routing, isolation, and cost controls.
+## 07|Agentic Systems|代理系統|🤖
+07-agentic-systems/README.md|Section Overview|Building production agents in 2026: loops, MCP, orchestration, memory, and eval.
+07-agentic-systems/01-agent-fundamentals.md|Agent Fundamentals|Closed-loop reasoning systems with built-in System-2 thinking.
+07-agentic-systems/02-reasoning-loops-react-and-beyond.md|Reasoning Loops: ReAct &amp; Beyond|Plan-and-Solve, Self-Reflexion, and inference-time scaling.
+07-agentic-systems/03-tool-use-and-mcp.md|Tool Use &amp; MCP|The Model Context Protocol (MCP 2.0) plus Agent-to-Agent (A2A).
+07-agentic-systems/04-multi-agent-orchestration.md|Multi-Agent Orchestration|Hierarchical supervisors, dynamic swarms, and cross-vendor networks.
+07-agentic-systems/05-agent-memory-and-state.md|Agent Memory &amp; State|A four-layer architecture: working, episodic, semantic, procedural.
+07-agentic-systems/06-planning-and-decomposition.md|Planning &amp; Decomposition|Recursive decomposition and tree search for multi-stage problems.
+07-agentic-systems/07-error-handling-and-recovery.md|Error Handling &amp; Recovery|Agentic self-correction and stateful rollbacks.
+07-agentic-systems/08-human-in-the-loop-patterns.md|Human-in-the-Loop Patterns|Co-reasoning and interrupt-based steering for high-stakes work.
+07-agentic-systems/09-agentic-security-and-sandboxing.md|Agentic Security &amp; Sandboxing|Action isolation and the proxy pattern against excessive agency.
+07-agentic-systems/10-evaluating-agentic-systems.md|Evaluating Agentic Systems|Trajectory benchmarks and LLM-as-judge for reliability and safety.
+## 08|Memory &amp; State|記憶與狀態|🧠
+08-memory-and-state/01-memory-architectures.md|Memory Architectures|A three-tiered (L1-L3) cognitive architecture for speed, cost, and recall.
+08-memory-and-state/02-short-term-context.md|Short-Term Context|L1 memory: KV-cache optimization and dynamic context allocation.
+08-memory-and-state/03-long-term-memory.md|Long-Term Memory|L2/L3 persistence across sessions via vector + graph + relational stores.
+08-memory-and-state/04-agentic-memory-mem0.md|Agentic Memory with Mem0|Active memory that digests conversations into evolving user profiles.
+08-memory-and-state/05-semantic-caching.md|Semantic Caching|Reuse completions for equivalent queries — a 30-70% cost cut.
+08-memory-and-state/06-state-management-patterns.md|State Management Patterns|Stateful agent graphs for persisting an agent's "mind".
+## 09|Frameworks &amp; Tools|框架與工具|🧰
+09-frameworks-and-tools/01-langchain-deep-dive.md|LangChain Deep Dive|A modular ecosystem for production LLM apps, with LCEL.
+09-frameworks-and-tools/02-langgraph-orchestration.md|LangGraph Orchestration|The de-facto standard for stateful, multi-agent systems.
+09-frameworks-and-tools/03-langsmith-observability.md|LangSmith Observability|Full trajectory debugging and automated eval pipelines.
+09-frameworks-and-tools/04-llamaindex.md|LlamaIndex|Data-centric AI: workflows and agentic data manipulation.
+09-frameworks-and-tools/05-dspy.md|DSPy|From prompt engineering to prompt compilation (a 10-40% lift).
+09-frameworks-and-tools/06-semantic-kernel.md|Semantic Kernel|Microsoft's enterprise orchestration engine for Azure / .NET.
+09-frameworks-and-tools/07-autogen-crewai.md|Agent Framework, CrewAI &amp; SDKs|The consolidated 2026 multi-agent SDK landscape.
+09-frameworks-and-tools/08-framework-selection-guide.md|Framework Selection Guide|A decision matrix for choosing your stack.
+09-frameworks-and-tools/09-claude-code.md|Claude Code|Anthropic's terminal-native autonomous coding agent.
+09-frameworks-and-tools/10-opencoderguide.md|OpenCoder Landscape|Open-weight coding models, agentic IDEs, and OSS agents.
+09-frameworks-and-tools/11-pydantic-ai-and-mastra.md|Pydantic AI &amp; Mastra|Typed agent frameworks for Python and TypeScript.
+## 10|Document Processing|文件處理|📄
+10-document-processing/01-ocr-and-layout.md|OCR &amp; Layout Analysis|Native multimodal LLMs that understand layouts, not just characters.
+## 11|Infrastructure &amp; MLOps|基礎設施與 MLOps|🏗️
+11-infrastructure-and-mlops/01-llm-infrastructure.md|LLM Infrastructure|Deployment options, scaling patterns, and operational concerns.
+11-infrastructure-and-mlops/02-cicd.md|CI/CD for LLM Apps|Adapting CI/CD for eval, prompt testing, and quality gates.
+## 12|Security &amp; Access|安全與存取控制|🔐
+12-security-and-access/01-llm-security.md|LLM Security|Prompt injection, data leakage, and LLM-specific threats.
+12-security-and-access/02-access-control.md|Access Control|Authentication, authorization, and data isolation patterns.
+## 13|Reliability &amp; Safety|可靠性與安全|🛡️
+13-reliability-and-safety/01-guardrails.md|Guardrails &amp; Safety|Input validation, output filtering, and action safety.
+13-reliability-and-safety/02-ensemble-methods.md|Ensemble Methods|Multi-model coordination to boost accuracy and reduce hallucination.
+13-reliability-and-safety/03-reliability-patterns.md|Reliability Patterns|Resilience patterns beyond basic retry logic.
+## 14|Evaluation &amp; Observability|評估與可觀測性|📊
+14-evaluation-and-observability/01-llm-evaluation.md|LLM Evaluation|Metrics and methodologies for measuring quality in production.
+14-evaluation-and-observability/02-observability.md|LLM Observability|Logs, metrics, and traces adapted for AI applications.
+## 15|AI Design Patterns|AI 設計模式|🧩
+15-ai-design-patterns/01-design-patterns.md|Design Patterns|A catalog of reusable AI system patterns with tradeoffs.
+15-ai-design-patterns/02-anti-patterns.md|Anti-Patterns|Common mistakes in AI system design to recognize and avoid.
+## 16|Case Studies|實戰案例|📚
+16-case-studies/01-enterprise-rag.md|Enterprise RAG System|Production RAG for enterprise document search, end-to-end.
+16-case-studies/02-conversational-agent.md|Customer Support Agent|A production support agent for a B2B SaaS company.
+16-case-studies/03-financial-analysis.md|Financial Analysis|High-reliability equity research with ensemble verification.
+16-case-studies/04-code-assistant.md|AI Code Assistant|Real-time suggestions, generation, and debugging help.
+16-case-studies/05-content-moderation.md|Content Moderation at Scale|Moderating millions of posts every day.
+16-case-studies/06-real-time-search.md|Real-Time AI Search|5-minute data freshness via streaming + hybrid search.
+16-case-studies/07-autonomous-coding-agent.md|Autonomous Coding Agent|Multi-file tasks with sandboxing + self-correction.
+16-case-studies/08-multi-tenant-saas.md|Multi-Tenant AI SaaS|Competitors on shared infra with defense-in-depth isolation.
+16-case-studies/09-customer-support-automation.md|Customer Support Automation|60% auto-resolution of 2M tickets per month.
+16-case-studies/10-document-intelligence.md|Document Intelligence|Extracting key terms from 50K contracts per month.
+16-case-studies/11-recommendation-engine.md|Recommendation Engine|Personalized explanations at 50M users.
+16-case-studies/12-compliance-automation.md|Compliance Automation|FDA pre-screening with claim extraction + precedent DB.
+16-case-studies/13-voice-ai-healthcare.md|Voice AI for Healthcare|Real-time clinical notes with on-prem ASR + HIPAA.
+16-case-studies/14-fraud-detection.md|Real-Time Fraud Detection|100ms decisions with an ML + rules hybrid.
+16-case-studies/15-knowledge-management.md|Knowledge Management|2M docs with permission-aware RAG.
+16-case-studies/16-computer-use-agent-production.md|Production Computer-Use Agent|14K expense reports/week with Firecracker isolation.
+16-case-studies/17-multi-tenant-fine-tuning-platform.md|Multi-Tenant Fine-Tuning|280 tenants on a shared base + per-tenant LoRA.
+16-case-studies/18-eval-gated-cicd.md|Eval-Gated CI/CD|Block PRs that regress AI quality before merge.
+16-case-studies/19-customer-distillation-pipeline.md|Customer Distillation Pipeline|Cut $50K/mo to ~$5K via trace-based distillation.
+16-case-studies/20-mcp-knowledge-agent.md|Enterprise MCP Knowledge Agent|Cross-system answers via MCP + OAuth + capability gating.
+## 17|Tool Use &amp; Computer Agents|工具使用與電腦代理|🖥️
+17-tool-use-and-computer-agents/01-tool-use-landscape.md|Tool-Use Landscape (2026)|The shift from JSON function calls to autonomous agents.
+17-tool-use-and-computer-agents/02-architecture-patterns.md|Architecture Patterns|The core patterns behind every tool-use agent.
+17-tool-use-and-computer-agents/03-openclaw-deep-dive.md|OpenClaw Deep Dive|An open-source, self-hosted personal AI agent.
+17-tool-use-and-computer-agents/04-computer-use-agents.md|Computer-Use Agents|LLMs that see screens and act via mouse and keyboard.
+17-tool-use-and-computer-agents/05-building-tool-agents.md|Building Tool Agents|Tool schemas, MCP servers, and testing for production.
+17-tool-use-and-computer-agents/06-use-cases-and-case-studies.md|Use Cases &amp; Case Studies|What's working in production agents, and what isn't.
+17-tool-use-and-computer-agents/07-safety-and-governance.md|Safety &amp; Governance|Defense-in-depth for agents that take real actions.
+</script>
+
+<!-- Learning paths + resources data -->
+<script type="text/plain" id="pathData">
+🎯|面試準備 Interview Prep|題庫 → 答題框架 → 白板演練 → 行為面試|00-interview-prep/01-question-bank.md
+🔍|打造生產級 RAG|基礎 → 切塊 → 向量庫 → 重排序 → 規模化|06-retrieval-systems/01-rag-fundamentals.md
+🤖|建構 AI 代理|代理基礎 → MCP 工具 → 多代理 → LangGraph|07-agentic-systems/01-agent-fundamentals.md
+🗺️|選對模型 (2026)|模型分類 → 能力評估 → 定價 → 選型|02-model-landscape/01-model-taxonomy.md
+📊|生產級評估與可觀測性|Phoenix / Langfuse → RAG 評估 → 評估閘 CI/CD|ai_evals_comprehensive_study_guide.md
+🔄|轉職進入 AI 領域|角色對照 → 學習路徑 → 推薦課程|TRANSITION_GUIDE.md
+</script>
+
+<script type="text/plain" id="resourceData">
+📖|Glossary 名詞表|每個關鍵術語的定義速查。|GLOSSARY.md
+🧩|Patterns 速查表|常見 AI 設計模式的快速查找。|PATTERNS.md
+🎓|推薦課程與學習路徑|2026 年驗證過的精選課程，無過時 MOOC。|COURSES.md
+🔄|角色轉職指南|Backend / QA / PM / EM 轉進 AI 角色的對照地圖。|TRANSITION_GUIDE.md
+🔬|AI Evals：Phoenix + Langfuse|3,000+ 行的 AI 評估深入指南。|ai_evals_comprehensive_study_guide.md
+🔬|AI Evals：LangWatch + Langfuse|同一套大綱，搭配 LangWatch 40+ 內建評估器。|ai_evals_complete_guide_langwatch_langfuse.md
+📋|README 專案總覽|完整導覽、快速導航與常見問題。|README.md
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Theme ---------- */
+  var root = document.documentElement;
+  var saved = null;
+  try { saved = localStorage.getItem("aisd-theme"); } catch (e) {}
+  var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  setTheme(saved || (prefersDark ? "dark" : "light"));
+  document.getElementById("themeToggle").addEventListener("click", function () {
+    setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  });
+  function setTheme(t) {
+    root.setAttribute("data-theme", t);
+    document.getElementById("themeToggle").textContent = t === "dark" ? "☀️" : "🌙";
+    try { localStorage.setItem("aisd-theme", t); } catch (e) {}
+    initMermaidTheme();
+    renderHomeDiagram();
+  }
+
+  /* ---------- Parse curriculum ---------- */
+  function parseCurriculum(text) {
+    var chapters = [];
+    var cur = null;
+    text.split("\n").forEach(function (raw) {
+      var line = raw.trim();
+      if (!line) return;
+      if (line.indexOf("## ") === 0) {
+        var h = line.slice(3).split("|");
+        cur = { num: h[0], en: h[1], zh: h[2], icon: h[3], lessons: [] };
+        chapters.push(cur);
+      } else if (cur) {
+        var p = line.split("|");
+        if (p.length >= 3) cur.lessons.push({ file: p[0], title: p[1], desc: p[2] });
+      }
+    });
+    return chapters;
+  }
+  var chapters = parseCurriculum(document.getElementById("curriculumData").textContent);
+
+  /* ---------- Stats ---------- */
+  var totalLessons = chapters.reduce(function (n, c) {
+    return n + c.lessons.filter(function (l) { return !/README\.md$/.test(l.file); }).length;
+  }, 0);
+  var caseCh = chapters.find(function (c) { return c.num === "16"; });
+  document.getElementById("statCh").textContent = chapters.length;
+  document.getElementById("statLessons").textContent = totalLessons + "+";
+  document.getElementById("statCases").textContent = caseCh ? caseCh.lessons.length : 20;
+
+  /* ---------- Reading progress ---------- */
+  var PROGRESS_KEY = "aisd-progress";
+  var completed = loadProgress();
+  function loadProgress() {
+    try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}") || {}; } catch (e) { return {}; }
+  }
+  function saveProgress() {
+    try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(completed)); } catch (e) {}
+  }
+  function setDone(file, done) {
+    if (done) completed[file] = 1; else delete completed[file];
+    saveProgress();
+    document.querySelectorAll(".lesson").forEach(function (card) {
+      if (card.getAttribute("href") === file) {
+        card.classList.toggle("done", !!done);
+        var t = card.querySelector(".done-toggle");
+        if (t) t.textContent = done ? "✓" : "";
+      }
+    });
+    updateProgressUI();
+    updateReaderDoneBtn();
+  }
+  function toggleDone(file) { setDone(file, !completed[file]); }
+  function updateProgressUI() {
+    var total = 0, done = 0;
+    chapters.forEach(function (c) {
+      var sec = document.getElementById("ch-" + c.num);
+      if (!sec) return;
+      var cards = sec.querySelectorAll(".lesson");
+      var cdone = 0;
+      cards.forEach(function (card) { if (completed[card.getAttribute("href")]) cdone++; });
+      total += cards.length; done += cdone;
+      var cc = sec.querySelector(".ch-count");
+      if (cc) cc.textContent = cdone + " / " + cards.length + " 課";
+    });
+    var pct = total ? Math.round((done / total) * 100) : 0;
+    var fill = document.getElementById("progressFill"); if (fill) fill.style.width = pct + "%";
+    var txt = document.getElementById("progressText");
+    if (txt) txt.textContent = "已完成 " + done + " / " + total + " 課（" + pct + "%）";
+  }
+
+  /* ---------- Render chip nav ---------- */
+  var chipNav = document.getElementById("chipNav");
+  chapters.forEach(function (c) {
+    var a = document.createElement("a");
+    a.className = "chip";
+    a.href = "#ch-" + c.num;
+    a.innerHTML = c.icon + " " + c.zh;
+    chipNav.appendChild(a);
+  });
+
+  /* ---------- Render curriculum ---------- */
+  var grid = document.getElementById("curriculumGrid");
+  chapters.forEach(function (c) {
+    var sec = document.createElement("div");
+    sec.className = "chapter";
+    sec.id = "ch-" + c.num;
+    sec.dataset.chapter = c.zh + " " + c.en;
+
+    var head = document.createElement("div");
+    head.className = "ch-head";
+    head.innerHTML =
+      '<div class="ch-num">' + c.num + '</div>' +
+      '<div class="ch-titles"><h3>' + c.icon + " " + c.en + '</h3>' +
+      '<span class="zh">' + c.zh + '</span></div>' +
+      '<span class="ch-count">' + c.lessons.length + ' 課</span>';
+    sec.appendChild(head);
+
+    var lessons = document.createElement("div");
+    lessons.className = "lessons";
+    c.lessons.forEach(function (l, i) {
+      var n = l.file.match(/\/(\d{2})-/);
+      var card = document.createElement("a");
+      card.className = "lesson";
+      card.href = l.file;
+      card.setAttribute("data-md", "");
+      card.dataset.search = (l.title + " " + l.desc + " " + c.en + " " + c.zh + " " + l.file).toLowerCase();
+      var doneInit = !!completed[l.file];
+      if (doneInit) card.classList.add("done");
+      card.innerHTML =
+        '<span class="done-toggle" title="標記為已讀">' + (doneInit ? "✓" : "") + "</span>" +
+        '<span class="lt">' + (n ? '<span class="n">' + n[1] + '</span>' : "") +
+        "<span>" + l.title + "</span></span>" +
+        '<p class="ld">' + l.desc + "</p>";
+      card.querySelector(".done-toggle").addEventListener("click", function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        toggleDone(l.file);
+      });
+      lessons.appendChild(card);
+    });
+    sec.appendChild(lessons);
+    grid.appendChild(sec);
+  });
+
+  /* ---------- Paths ---------- */
+  var pathGrid = document.getElementById("pathGrid");
+  document.getElementById("pathData").textContent.split("\n").forEach(function (raw) {
+    var line = raw.trim(); if (!line) return;
+    var p = line.split("|");
+    var a = document.createElement("a");
+    a.className = "path";
+    a.href = p[3];
+    a.setAttribute("data-md", "");
+    a.innerHTML =
+      '<div class="pico">' + p[0] + "</div>" +
+      "<h3>" + p[1] + "</h3>" +
+      '<div class="steps">' + p[2] + "</div>" +
+      '<div class="go">開始學習 →</div>';
+    pathGrid.appendChild(a);
+  });
+
+  /* ---------- Resources ---------- */
+  var resGrid = document.getElementById("resourceGrid");
+  document.getElementById("resourceData").textContent.split("\n").forEach(function (raw) {
+    var line = raw.trim(); if (!line) return;
+    var p = line.split("|");
+    var a = document.createElement("a");
+    a.className = "res";
+    a.href = p[3];
+    a.setAttribute("data-md", "");
+    a.innerHTML =
+      '<span class="ico">' + p[0] + "</span>" +
+      "<span><h4>" + p[1] + "</h4><p>" + p[2] + "</p></span>";
+    resGrid.appendChild(a);
+  });
+
+  /* ---------- Search ---------- */
+  var search = document.getElementById("search");
+  var resultCount = document.getElementById("resultCount");
+  var emptyState = document.getElementById("emptyState");
+  function runSearch() {
+    var q = search.value.trim().toLowerCase();
+    var shown = 0;
+    chapters.forEach(function (c) {
+      var sec = document.getElementById("ch-" + c.num);
+      var cards = sec.querySelectorAll(".lesson");
+      var visible = 0;
+      cards.forEach(function (card) {
+        var match = !q || card.dataset.search.indexOf(q) !== -1;
+        card.style.display = match ? "" : "none";
+        if (match) visible++;
+      });
+      sec.style.display = visible ? "" : "none";
+      shown += visible;
+    });
+    resultCount.textContent = q ? shown + " 個結果" : "";
+    emptyState.style.display = q && shown === 0 ? "block" : "none";
+  }
+  search.addEventListener("input", runSearch);
+
+  /* ---------- Reader modal ---------- */
+  var overlay = document.getElementById("readerOverlay");
+  var body = document.getElementById("readerBody");
+  var titleEl = document.getElementById("readerTitle");
+  var srcEl = document.getElementById("readerSrc");
+  var currentReaderFile = null;
+  var readerDoneBtn = document.getElementById("readerDone");
+  function updateReaderDoneBtn() {
+    if (!readerDoneBtn) return;
+    var done = !!(currentReaderFile && completed[currentReaderFile]);
+    readerDoneBtn.classList.toggle("done", done);
+    readerDoneBtn.textContent = done ? "已完成 ✓" : "標記已讀";
+  }
+  if (readerDoneBtn) readerDoneBtn.addEventListener("click", function () {
+    if (currentReaderFile) toggleDone(currentReaderFile);
+  });
+
+  function basePath(file) { return file.replace(/[^/]+$/, ""); }
+
+  async function openReader(file, title) {
+    overlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+    titleEl.textContent = title || file;
+    srcEl.href = file;
+    currentReaderFile = file;
+    updateReaderDoneBtn();
+    body.innerHTML = '<div class="loading">載入中…</div>';
+    overlay.scrollTop = 0;
+    try {
+      var res = await fetch(file, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      var md = await res.text();
+      if (window.marked) {
+        // fix relative links so they keep working within the repo
+        var html = marked.parse(md);
+        body.innerHTML = html;
+        rewriteLinks(file);
+        renderMermaid();
+      } else {
+        var pre = document.createElement("pre");
+        pre.textContent = md;
+        body.innerHTML = "";
+        body.appendChild(pre);
+      }
+    } catch (e) {
+      body.innerHTML =
+        '<div class="fallback">' +
+        "<strong>無法在頁面內載入這份文件。</strong><br><br>" +
+        "若你是用 <code>file://</code> 直接開啟這個 HTML，瀏覽器會基於安全限制封鎖讀取本機檔案。" +
+        "請改用本機伺服器開啟，例如在專案根目錄執行：<br><br>" +
+        "<code>python3 -m http.server</code><br><br>" +
+        "然後瀏覽 <code>http://localhost:8000/index.html</code>。<br><br>" +
+        "或直接<a href='" + file + "' target='_blank' rel='noopener'>開啟原始 Markdown 檔 ↗</a>。" +
+        "</div>";
+    }
+  }
+
+  function rewriteLinks(file) {
+    var dir = basePath(file);
+    body.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || /^(https?:|mailto:|#)/.test(href)) {
+        if (/^https?:/.test(href)) { a.target = "_blank"; a.rel = "noopener"; }
+        return;
+      }
+      // resolve relative to the current doc's directory
+      var resolved = new URL(dir + href, window.location.href).pathname;
+      if (/\.md(#.*)?$/i.test(href)) {
+        a.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          openReader(resolved.replace(/^\//, ""), null);
+        });
+      } else {
+        a.setAttribute("href", resolved);
+      }
+    });
+  }
+
+  function renderMermaid() {
+    if (!window.mermaid) return;
+    var blocks = body.querySelectorAll("code.language-mermaid");
+    if (!blocks.length) return;
+    blocks.forEach(function (code) {
+      var div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      var pre = code.closest("pre");
+      (pre || code).replaceWith(div);
+    });
+    try { mermaid.run({ nodes: body.querySelectorAll(".mermaid") }); } catch (e) {}
+  }
+
+  function closeReader() {
+    overlay.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  document.getElementById("readerClose").addEventListener("click", closeReader);
+  overlay.addEventListener("click", function (e) { if (e.target === overlay) closeReader(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeReader(); });
+
+  // Intercept all [data-md] links → open in reader (ctrl/cmd-click still opens raw file)
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest("a[data-md]");
+    if (!a) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // let new-tab work
+    e.preventDefault();
+    var title = a.querySelector(".lt span:last-child") ? a.querySelector(".lt span:last-child").textContent
+              : (a.querySelector("h3") || a.querySelector("h4") || a).textContent.trim();
+    openReader(a.getAttribute("href"), title);
+  });
+
+  /* ---------- Reset progress ---------- */
+  var resetBtn = document.getElementById("resetProgress");
+  if (resetBtn) resetBtn.addEventListener("click", function () {
+    if (!window.confirm("確定要清除所有閱讀進度嗎？")) return;
+    completed = {};
+    saveProgress();
+    document.querySelectorAll(".lesson.done").forEach(function (card) {
+      card.classList.remove("done");
+      var t = card.querySelector(".done-toggle"); if (t) t.textContent = "";
+    });
+    updateProgressUI();
+    updateReaderDoneBtn();
+  });
+
+  /* ---------- Home diagram + mermaid ---------- */
+  var HOME_DIAGRAM = [
+    "flowchart TD",
+    "  A([新訪客 New visitor]) --> B{你的目標？}",
+    "  B -->|面試準備| C[題庫 110+]",
+    "  B -->|打造 RAG| D[RAG 基礎]",
+    "  B -->|建構代理| E[代理基礎]",
+    "  B -->|選擇模型| F[模型分類]",
+    "  B -->|評估 AI| G[AI Evals 指南]",
+    "  C --> H[答題框架]",
+    "  D --> I[切塊 + 向量資料庫]",
+    "  E --> J[MCP 與工具使用]",
+    "  F --> K[定價與選型 2026]",
+    "  G --> L[Phoenix / LangWatch]"
+  ].join("\n");
+  function initMermaidTheme() {
+    if (!window.mermaid) return;
+    try {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: root.getAttribute("data-theme") === "dark" ? "dark" : "default",
+        flowchart: { useMaxWidth: true, htmlLabels: true }
+      });
+    } catch (e) {}
+  }
+  function renderHomeDiagram() {
+    if (!window.mermaid) return;
+    var el = document.getElementById("homeDiagram");
+    if (!el) return;
+    el.removeAttribute("data-processed");
+    el.innerHTML = HOME_DIAGRAM;
+    try { mermaid.run({ nodes: [el] }); } catch (e) {}
+  }
+  window.__aisd = {
+    markedReady: function () { if (window.marked) { try { marked.setOptions({ gfm: true, breaks: false }); } catch (e) {} } },
+    mermaidReady: function () { initMermaidTheme(); renderHomeDiagram(); }
+  };
+
+  runSearch();
+  updateProgressUI();
+})();
+</script>
+<script>
+/* Offline-capable loader: try vendored libs in assets/ first, fall back to CDN */
+(function () {
+  function loadFirst(urls, cb) {
+    var i = 0;
+    (function go() {
+      if (i >= urls.length) { cb(false); return; }
+      var s = document.createElement("script");
+      s.src = urls[i++];
+      s.onload = function () { cb(true); };
+      s.onerror = function () { if (s.parentNode) s.parentNode.removeChild(s); go(); };
+      (document.head || document.documentElement).appendChild(s);
+    })();
+  }
+  loadFirst(["assets/marked.min.js", "https://cdn.jsdelivr.net/npm/marked/marked.min.js"],
+    function () { if (window.__aisd) window.__aisd.markedReady(); });
+  loadFirst(["assets/mermaid.min.js", "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"],
+    function () { if (window.__aisd) window.__aisd.mermaidReady(); });
+})();
+</script>
+</body>
+</html>
