@@ -2,6 +2,19 @@
 ### The Complete Interview & Production Reference
 
 <p align="center">
+  <a href="https://jordanplus.github.io/my-ai-system-design-guide-study/"><img src="https://img.shields.io/badge/%F0%9F%8C%90%20Live%20Study%20Site-Open-5b5bd6?style=for-the-badge" alt="Open the live study site"></a>
+  <a href="https://jordanplus.github.io/my-ai-system-design-guide-study/ai-system-design-guide.html"><img src="https://img.shields.io/badge/%F0%9F%93%91%20Report-View-00a99d?style=for-the-badge" alt="View the HTML report"></a>
+  <a href="https://github.com/Jordanplus/my-ai-system-design-guide-study/deployments/github-pages"><img src="https://img.shields.io/github/deployments/Jordanplus/my-ai-system-design-guide-study/github-pages?label=pages&style=for-the-badge" alt="GitHub Pages deployment status"></a>
+</p>
+
+<p align="center">
+  <b>📖 線上互動學習：<a href="https://jordanplus.github.io/my-ai-system-design-guide-study/">jordanplus.github.io/my-ai-system-design-guide-study</a><br>
+  本機啟動：<code>make study</code>（啟動本機伺服器並開啟 <code>index.html</code>，含即時搜尋、深色模式、頁內 Markdown 閱讀器與學習進度追蹤）</b>
+</p>
+
+---
+
+<p align="center">
   <a href="https://github.com/ombharatiya"><img src="https://img.shields.io/badge/Follow%20on%20GitHub-ombharatiya-181717?style=for-the-badge&logo=github" alt="Follow on GitHub"></a>
   <a href="https://x.com/ombharatiya"><img src="https://img.shields.io/badge/Follow%20on%20Twitter-@ombharatiya-1DA1F2?style=for-the-badge&logo=x" alt="Follow on Twitter"></a>
   <a href="https://linkedin.com/in/ombharatiya"><img src="https://img.shields.io/badge/Connect%20on%20LinkedIn-ombharatiya-0A66C2?style=for-the-badge&logo=linkedin" alt="Connect on LinkedIn"></a>
